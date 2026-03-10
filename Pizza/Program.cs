@@ -1,9 +1,8 @@
 ﻿
-using MyApp.Interfaces;
 using MyApp.PizzaClasses;
 using MyApp.UIStuff;
 
-
+//TODO: при изменении ингридиента изменить также цену и название везде, где он используется.
 namespace MyApp{
     class Program
     {

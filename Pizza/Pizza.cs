@@ -1,36 +1,21 @@
-using MyApp.Interfaces;
+using MyApp.ClassFoundations;
+using MyApp.Utility;
 
 namespace MyApp.PizzaClasses
 {
     public class Pizza : PizzaPart
     {
-        private string _name;
-        private int _price;
+
         private PizzaBase _base;
-        private List<Ingredient> _ingredients = [];
+        private List<Ingredient> _ingredients = new List<Ingredient> (16);
+        private Edge _edge;
+        private int _size = 0;
 
-        public string Name
-        {
-            get => _name;
-            set
-            {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    throw new ArgumentException("Название не может быть пустой строкой: ", nameof(value));
-                }
-                _name = value;
-            }
-        }
-
-        public int Price
+        public override int Price
         {
             get => _price;
 
-            set
-            {
-                // - "Рванёт?"
-                // - "Да вроде не должно..."
-            }
+            set {}
         }
 
         public void UpdatePrice()
@@ -57,23 +42,56 @@ namespace MyApp.PizzaClasses
                 }
             }
         }
-        public void AddIngredient(Ingredient ingredient)
+
+        public int Size
         {
-            _ingredients.Add(ingredient); // Да, можно добавить 238 ветчины на тонкую пиццу, но не мне судить такое решение со стороны клиента.
+            get => _size;
+            set
+            {
+                _size = value;
+            }
+        }
+        public void AddIngredient(Ingredient ingredient, bool do_remove_duplicates = true)
+        {
+            if (_ingredients.Count == 16)
+            {
+                Console.Write("            Невозможно добавить больше 16 ингредиентов");
+            }
+            else{
+                _ingredients.Add(ingredient);
+                if (do_remove_duplicates){
+                    UtilityClass.RemoveDuplicatesFromIngredientList(ref _ingredients);
+                }
+            }
         }
 
-        public string Display()
+        public List<Ingredient> GetIngredients()
         {
-            string display_string = @$"{_name}: {_price}₽
+            return _ingredients;
+        }
+
+        public override string Display()
+        {
+            string additional_string = "";
+            switch (_size)
+            {
+                case 6:
+                    additional_string = "Маленькая";
+                    break;
+                case 8:
+                    additional_string = "Средняя";
+                    break;
+                case 12:
+                    additional_string = "Большая";
+                    break;
+                case 0:
+                    break;
+            }
+            string display_string = @$"{_name}: {_price} {additional_string}₽
                 Основа:
                     {_base.Name}: {_base.Price}₽
                 Ингредиенты:" + "\n";
-            int i = 1;
-            foreach(Ingredient ingredient in _ingredients)
-            {
-                display_string += "                    " + i + ": " + ingredient.Display() + "\n";
-                i++;
-            }
+            display_string += DisplayIngredients();
             return display_string;
         }
 
@@ -97,5 +115,20 @@ namespace MyApp.PizzaClasses
         {
             _ingredients.RemoveAt(index);
         }
+
+        public Ingredient ReturnIngredient(int index)
+        {
+            return _ingredients[index];
+        }
+        /*
+        public void FillIngredients(List<Ingredient> ingredients)
+        {
+            foreach (Ingredient ingredient in ingredients)
+            {
+                _ingredients.Add(ingredient);
+            }
+            UpdatePrice();
+        }
+        */
     }
 }

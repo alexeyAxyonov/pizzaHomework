@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.IO.Pipelines;
 using MyApp.PizzaClasses;
 
 namespace MyApp.Utility
@@ -32,20 +34,53 @@ namespace MyApp.Utility
             return value;
         }
 
-        public static string ValidateInputForChangePizzas(int length, string value, string message)
+        public static DateTime ValidateDateTimeInput(string value, string message)
         {
             while (true)
             {
-                if (!string.IsNullOrWhiteSpace(value) && (int.Parse(value) >= 0 ) && (int.Parse(value) <= length))
+                if (!string.IsNullOrWhiteSpace(value))
                 {
-                    break;
+                    if (DateTime.TryParseExact(
+                        value.Trim(), "dd/MM/yyyy HH/mm/ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime result))
+                    {
+                        return result;
+                    }
+                    else
+                    {
+                        value = "";
+                    }
                 }
-                else{
+                else
+                {
                     Console.Write(message);
                     value = Console.ReadLine();
                 }
             }
-            return value;
+        }
+
+        public static int ValidatePizzaSize(int value, string message)
+        {
+            string var = "";
+            while (true)
+            {
+                if (!string.IsNullOrWhiteSpace(var))
+                {
+                    value = int.Parse(var);
+                    if (value == 6 || value == 10 || value == 12)
+                    {
+                        return value;
+                    }
+                    else
+                    {
+                        var = "";
+                    }
+                }
+                else
+                {
+                    Console.Write(message);
+                    var = Console.ReadLine();
+                }
+            }
         }
 
         public static void RemoveDuplicatesFromIngredientList(ref List<Ingredient> list_var)
@@ -59,6 +94,11 @@ namespace MyApp.Utility
             list_var = [.. list_var
                 .GroupBy(p => p.Name)
                 .Select(g => g.OrderByDescending(p => p.Price).First())];
+        }
+
+        public static void RemoveDuplicatesFromIngredientArray(ref Ingredient[] arr_var)
+        {
+            arr_var = [.. arr_var.Distinct()];
         }
 
         public static bool CheckBasesAfterChangingClassic(List<PizzaBase> pizza_bases, int new_classic_price)
